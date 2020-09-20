@@ -127,9 +127,8 @@
 
       function newMapping(pointsCoords) {
 
-        //L.geoJSON(pointsCoords).addTo(map);
-        console.log(pointsCoords.geometry.coordinates[0].lat)
-        var marker = L.marker([pointsCoords.geometry.coordinates]).addTo(map);
+        L.circleMarker(pointsCoords).addTo(map);
+        console.log(L.circleMarker(pointsCoords));
       }
 
     </script>
