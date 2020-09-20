@@ -5,7 +5,6 @@ class NameForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.onMapClick = this.onMapClick.bind(this);
   }
 
 
@@ -17,24 +16,19 @@ class NameForm extends React.Component {
     alert('A new value was submitted: ' + this.state.value);
     event.preventDefault();
     pointsCoords.geometry.value.push(Number(this.state.value))
+    document.getElementById("newLatitude").value = "";
+    document.getElementById("newLongitude").value = "";
+    document.getElementById("enteredValue").value = "";
     newMapping(pointsCoords);
   }
 
-   onMapClick(e) {
-    let point = L.circleMarker(e.latlng)
-    console.log(point)
-   }
-
   render() {
-
-  <map onClick={this.onMapClick}>
-  </map>
 
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
           Value: 
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
+          <input type="text" id="enteredValue" value={this.state.value} onChange={this.handleChange} />
         </label>
         <input type="submit" value="Submit" />
       </form>

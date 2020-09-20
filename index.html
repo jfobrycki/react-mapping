@@ -41,6 +41,22 @@
       color: white;
       font-size: 1.5em;
     }
+
+    .totalPoints {
+      z-index: 3000;
+      position: absolute;
+      top: 200px;
+      left: 100px;
+      color: white;
+      font-size: 1.5em;
+    }
+
+    button {
+      z-index: 3000;
+      position: absolute;
+      top: 240px;
+      left: 100px;
+    }
   </style>
 </head>
 
@@ -51,87 +67,126 @@
     <input type="text" id="newLatitude" value="">
   </form>
 
-    <form action="" class="longitudeTextbox">
-      <label for="fname">Longitude:</label>
-      <input type="text" id="newLongitude" value="">
-    </form>
-      
+  <form action="" class="longitudeTextbox">
+    <label for="fname">Longitude:</label>
+    <input type="text" id="newLongitude" value="">
+  </form>
+
+  <form action="" class="totalPoints">
+    <label for="fname">Total Points:</label>
+    <input type="text" id="countPoints" value="">
+  </form>
+
+  <button type="button" id="getData">Get Data</button>
 
 
 
-    
+  <!-- We will put our React component inside this div. -->
+  <div id="map"></div>
+  <div id="pointValue"></div>
 
-    <!-- We will put our React component inside this div. -->
-    <div id="map"></div>
-    <div id="pointValue"></div>
+  <!-- Load React. -->
+  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 
-    <!-- Load React. -->
-    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <!-- Load React -->
+  <script src="update_map.js" type="text/babel"></script>
 
-    <!-- Load React -->
-    <script src="update_map.js" type="text/babel"></script>
+  <script>
+    // add the map 
 
-    <script>
-      // add the map 
+    var map = L.map("map", {
+      zoomSnap: 0.1,
+      center: [40.33077, -99.5182],
+      zoom: 4.2
+    });
 
-      var map = L.map("map", {
-        zoomSnap: 0.1,
-        center: [40.33077, -99.5182],
-        zoom: 4.2
-      });
+    // add tile layers, using satellite imagery
 
-      // add tile layers, using satellite imagery
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }).addTo(map);
 
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+
+
+    var pointsCoords = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [],
+        "value": []
+      }
+    };
+
+    function onMapClick(e) {
+
+      // create circle and store with reference
+      let point = L.circleMarker(e.latlng, {
+        "opacity": 1,
+        "radius": 5,
+        "fillOpacity": 0.6,
+        "color": 'yellow',
+        "fillColor": 'yellow',
+        //close newMarker
       }).addTo(map);
 
+      document.getElementById("newLatitude").value = e.latlng.lat;
+      document.getElementById("newLongitude").value = e.latlng.lng;
+
+      console.log(e.latlng)
+
+      pointsCoords.geometry.coordinates.push(e.latlng);
+
+      console.log(pointsCoords);
+
+    }
 
 
-      var pointsCoords = {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [],
-          "value": []
+    map.on('click', onMapClick);
+
+    function newMapping(pointsCoords) {
+      console.log(pointsCoords)
+
+      document.getElementById("countPoints").value = pointsCoords.geometry.coordinates.length;
+      // L.circleMarker(pointsCoords).addTo(map);
+      console.log(L.circleMarker(pointsCoords));
+      downloadPoints(pointsCoords)
+    }
+
+
+    function downloadPoints(pointsCoords) {
+      document.getElementById("getData").addEventListener("click", function () {
+
+
+        const rows = [
+          ["Sample Point", "Longitude", "Latitude", "Value"],
+        ]
+
+        for (let i = 0; i < pointsCoords.geometry.coordinates.length; i++) {
+          rows.push(
+            [i + 1, pointsCoords.geometry.coordinates[i].lng, pointsCoords.geometry.coordinates[i].lat, pointsCoords.geometry.value[i]]
+          )
         }
-      };
 
-      function onMapClick(e) {
+        let csvContent = "data:text/csv;charset=utf-8,"
+          + rows.map(e => e.join(",")).join("\n");
 
-        // create circle and store with reference
-        let point = L.circleMarker(e.latlng, {
-          "opacity": 1,
-          "radius": 5,
-          "fillOpacity": 0.6,
-          "color": 'yellow',
-          "fillColor": 'yellow',
-          //close newMarker
-        }).addTo(map);
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "SampleLocationData.csv");
+        document.body.appendChild(link); // Required for FF
 
-        document.getElementById("newLatitude").value = e.latlng.lat;
-        document.getElementById("newLongitude").value = e.latlng.lng;
+        link.click(); // This will download the data file named "my_data.csv".
 
-        console.log(e.latlng)
-
-        pointsCoords.geometry.coordinates.push(e.latlng);
-        console.log(pointsCoords);
       }
+      )
+    }
 
-
-      map.on('click', onMapClick);
-
-      function newMapping(pointsCoords) {
-
-        L.circleMarker(pointsCoords).addTo(map);
-        console.log(L.circleMarker(pointsCoords));
-      }
-
-    </script>
+  </script>
 
 </body>
 
