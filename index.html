@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Example React Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+  <style>
+    #map {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      bottom: 0;
+    }
+
+    #pointValue {
+      z-index: 3000;
+      position: absolute;
+      top: 160px;
+      left: 100px;
+      color: white;
+      font-size: 1.5em;
+    }
+
+    .latitudeTextbox {
+      z-index: 3000;
+      position: absolute;
+      top: 80px;
+      left: 100px;
+      color: white;
+      font-size: 1.5em;
+    }
+
+    .longitudeTextbox {
+      z-index: 3000;
+      position: absolute;
+      top: 120px;
+      left: 100px;
+      color: white;
+      font-size: 1.5em;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form action="" class="latitudeTextbox">
+    <label for="fname">Latitude:</label>
+    <input type="text" id="newLatitude" value="">
+  </form>
+
+    <form action="" class="longitudeTextbox">
+      <label for="fname">Longitude:</label>
+      <input type="text" id="newLongitude" value="">
+    </form>
+      
+
+
+
+    
+
+    <!-- We will put our React component inside this div. -->
+    <div id="map"></div>
+    <div id="pointValue"></div>
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+
+    <!-- Load React -->
+    <script src="update_map.js" type="text/babel"></script>
+
+    <script>
+      // add the map 
+
+      var map = L.map("map", {
+        zoomSnap: 0.1,
+        center: [40.33077, -99.5182],
+        zoom: 4.2
+      });
+
+      // add tile layers, using satellite imagery
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      }).addTo(map);
+
+
+
+      var pointsCoords = {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [],
+          "value": []
+        }
+      };
+
+      function onMapClick(e) {
+
+        // create circle and store with reference
+        let point = L.circleMarker(e.latlng, {
+          "opacity": 1,
+          "radius": 5,
+          "fillOpacity": 0.6,
+          "color": 'yellow',
+          "fillColor": 'yellow',
+          //close newMarker
+        }).addTo(map);
+
+        document.getElementById("newLatitude").value = e.latlng.lat;
+        document.getElementById("newLongitude").value = e.latlng.lng;
+
+        console.log(e.latlng)
+
+        pointsCoords.geometry.coordinates.push(e.latlng);
+        console.log(pointsCoords);
+      }
+
+
+      map.on('click', onMapClick);
+
+      function newMapping(pointsCoords) {
+
+        //L.geoJSON(pointsCoords).addTo(map);
+        console.log(pointsCoords.geometry.coordinates[0].lat)
+        var marker = L.marker([pointsCoords.geometry.coordinates]).addTo(map);
+      }
+
+    </script>
+
+</body>
+
+</html>
