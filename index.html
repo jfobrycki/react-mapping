@@ -121,36 +121,43 @@
       }
     };
 
+    let i = 0;
+
+
     function onMapClick(e) {
 
-      // create circle and store with reference
-      let point = L.circleMarker(e.latlng, {
-        "opacity": 1,
-        "radius": 5,
-        "fillOpacity": 0.6,
-        "color": 'yellow',
-        "fillColor": 'yellow',
-        //close newMarker
-      }).addTo(map);
+      i++
 
-      document.getElementById("newLatitude").value = e.latlng.lat;
-      document.getElementById("newLongitude").value = e.latlng.lng;
+      if (i > 1) {
+        // increment by one
+        alert("Please enter a value for the point")
+        i--
+      } else {
 
-      console.log(e.latlng)
 
-      pointsCoords.geometry.coordinates.push(e.latlng);
+        // create circle and store with reference
+        let point = L.circleMarker(e.latlng, {
+          "opacity": 1,
+          "radius": 5,
+          "fillOpacity": 0.6,
+          "color": 'yellow',
+          "fillColor": 'yellow',
+          //close newMarker
+        }).addTo(map);
 
-      console.log(pointsCoords);
+        document.getElementById("newLatitude").value = e.latlng.lat;
+        document.getElementById("newLongitude").value = e.latlng.lng;
 
-      map.on('click', secondClick);
-      function secondClick(e) {
-      alert("Please click the submit button")
+        console.log(e.latlng)
+
+        pointsCoords.geometry.coordinates.push(e.latlng);
+
+        console.log(pointsCoords);
+
       }
     }
 
-
     map.on('click', onMapClick);
-   
 
     function newMapping(pointsCoords) {
       console.log(pointsCoords)

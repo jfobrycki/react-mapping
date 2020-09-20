@@ -19,6 +19,7 @@ class NameForm extends React.Component {
     document.getElementById("newLatitude").value = "";
     document.getElementById("newLongitude").value = "";
     document.getElementById("enteredValue").value = "";
+    i --;
     newMapping(pointsCoords);
   }
 
