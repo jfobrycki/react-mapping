@@ -5,6 +5,7 @@ class NameForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onMapClick = this.onMapClick.bind(this);
   }
 
 
@@ -19,7 +20,16 @@ class NameForm extends React.Component {
     newMapping(pointsCoords);
   }
 
+   onMapClick(e) {
+    let point = L.circleMarker(e.latlng)
+    console.log(point)
+   }
+
   render() {
+
+  <map onClick={this.onMapClick}>
+  </map>
+
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
