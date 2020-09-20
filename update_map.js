@@ -13,7 +13,7 @@ class NameForm extends React.Component {
   }
 
   handleSubmit(event) {
-    alert('A new value was submitted: ' + this.state.value + 'and is associated with ' + pointsCoords.geometry.coordinates );
+    alert('A new value was submitted: ' + this.state.value + '\n\nLatitude ' + document.getElementById("newLatitude").value + ' \nLongitude ' + document.getElementById("newLongitude").value );
     event.preventDefault();
     pointsCoords.geometry.value.push(Number(this.state.value))
     document.getElementById("newLatitude").value = "";

@@ -142,10 +142,15 @@
 
       console.log(pointsCoords);
 
+      map.on('click', secondClick);
+      function secondClick(e) {
+      alert("Please click the submit button")
+      }
     }
 
 
     map.on('click', onMapClick);
+   
 
     function newMapping(pointsCoords) {
       console.log(pointsCoords)
