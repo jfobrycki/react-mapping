@@ -8,7 +8,7 @@
   <!--Load in leaflet style sheet-->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
-
+  <!--Set up several CSS-->
   <style>
     #map {
       position: absolute;
@@ -63,27 +63,6 @@
       background-color: #F7C44D;
     }
 
-    p {
-      z-index: 3000;
-      position: absolute;
-      top: 360px;
-      left: 100px;
-      height: 50px;
-      font-size: 1.5em;
-      color: black;
-      padding: 8px 15px;
-      margin: 0;
-      font-size: 1em;
-      background: rgba(255, 255, 255, 1);
-      border-radius: 10px;
-      border-bottom: 1px dotted;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-      width: 250px;
-
-    }
-
     .tooltip {
       z-index: 3000;
       top: 360px;
@@ -93,7 +72,6 @@
       border-bottom: 1px dotted white;
       color: white;
       font-size: 1.5em;
-
     }
 
     .tooltip .tooltiptext {
@@ -105,7 +83,6 @@
       border-radius: 6px;
       padding: 5px 0;
       font-size: 0.75em;
-
       /* Position the tooltip */
       position: absolute;
       z-index: 1;
@@ -116,12 +93,11 @@
     .tooltip:hover .tooltiptext {
       visibility: visible;
     }
-    
   </style>
 </head>
 
 <body>
-
+  <!--Set up the different text boxes that are used-->
   <form action="" class="latitudeTextbox">
     <label for="fname">Latitude:</label>
     <input type="text" id="newLatitude" value="">
@@ -137,9 +113,10 @@
     <input type="text" id="countPoints" value="" size="3">
   </form>
 
+  <!--Set up the get data button-->
   <button type="button" class="button1" id="getData">Get Data</button>
 
-  <!-- We will put our React component inside this div. -->
+  <!--Set up the map information tooltip-->
   <div class="tooltip">Map information
     <span class="tooltiptext">Create your own data points and download
       <br>
@@ -151,23 +128,26 @@
     </span>
   </div>
 
+  <!--Create the map div-->
   <div id="map"></div>
+  <!--Set up the React div, this is the pointValue referenced in update_map.js-->
   <div id="pointValue"></div>
 
-  <!-- Load React. -->
-  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+  <!--Load React-->
+  <!--As described in the React website, when the map is fully deployed, replace "development.js" with "production.min.js".-->
   <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <!--Load in the JSX converter to allow for using "text/babel" instead of fully loading React-->
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!--Load in Leaflet for creating the map-->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <!--Load in jQuery-->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
-  <!-- Load React -->
+  <!-- Load React, and note the text/babel option utilized for reading the script-->
   <script src="update_map.js" type="text/babel"></script>
 
   <script>
     // add the map 
-
     var map = L.map("map", {
       zoomSnap: 0.1,
       center: [40.33077, -99.5182],
@@ -180,8 +160,7 @@
       attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     }).addTo(map);
 
-
-
+    // create the pointsCoords object
     var pointsCoords = {
       "type": "Feature",
       "geometry": {
@@ -191,20 +170,24 @@
       }
     };
 
+    // create the counter for the number of map clicks
     let i = 0;
 
-
+    // start the onMapClick function to create points
     function onMapClick(e) {
 
+      // counter increases by one
       i++
 
+      // if the counter is greater than one, show the following alert
       if (i > 1) {
-        // increment by one
+        // ask the user to enter a value for the point to avoid having multiple points with no values on the map
         alert("Please enter a value for the point")
+        // also, reduce the counter by one to reset this double check feature
         i--
       } else {
-
-
+        // if the counter is < 1, then no alert appears
+        
         // create circle and store with reference
         let point = L.circleMarker(e.latlng, {
           "opacity": 1,
@@ -215,54 +198,60 @@
           //close newMarker
         }).addTo(map);
 
+        // send the latitude and longitude of this point to the map
         document.getElementById("newLatitude").value = e.latlng.lat;
         document.getElementById("newLongitude").value = e.latlng.lng;
 
-        console.log(e.latlng)
+        // send the coordinates to the pointsCoords object too
         pointsCoords.geometry.coordinates.push(e.latlng);
-
-        console.log(pointsCoords);
-
-      }
-    }
+      } // close the else
+    } // close the onMapClick function
 
 
+    // allow the onMapClick function to work when the map is clicked
     map.on('click', onMapClick);
 
+    // the pointsCoords is sent to the newMapping function through the update_map.js code
     function newMapping(pointsCoords) {
+      // send the total number of points to the map field
       document.getElementById("countPoints").value = pointsCoords.geometry.coordinates.length;
+      // send the pointsCoords object to the downloadPoints function
       downloadPoints(pointsCoords)
     }
 
-
+    // the downloadPoints function allows the user to get a list of all of the datapoints entered on the map
+    // the following code is adapted from https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
     function downloadPoints(pointsCoords) {
+      // function only operates if the getData button is clicked
       document.getElementById("getData").addEventListener("click", function () {
-
-
+      // set up the rows to be exported in the csv
         const rows = [
           ["Sample Point", "Longitude", "Latitude", "Value"],
         ]
-
+      // create a for loop to write each piece of pointsCoords to a csv
+      // every row consists of the point number (increased by one to account for the first item having a value of 0)
+      // this is followed by the longitude, latitude, and the entered value
+      // the entered value could be a number or could be text
         for (let i = 0; i < pointsCoords.geometry.coordinates.length; i++) {
           rows.push(
             [i + 1, pointsCoords.geometry.coordinates[i].lng, pointsCoords.geometry.coordinates[i].lat, pointsCoords.geometry.value[i]]
-          )
-        }
+          )} // end of for loop
 
+      // the csv format is specified and is then mapped together
         let csvContent = "data:text/csv;charset=utf-8,"
           + rows.map(e => e.join(",")).join("\n");
 
+      
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "SampleLocationData.csv");
-        document.body.appendChild(link); // Required for FF
+        document.body.appendChild(link); // Required for firefox
 
-        link.click(); // This will download the data file named "my_data.csv".
+        link.click(); // downloads the data
 
-      }
-      )
-    }
+      }) // end of the eventListener
+    } // end of downloadPoints function
 
   </script>
 
