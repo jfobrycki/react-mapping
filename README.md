@@ -1,10 +1,10 @@
 # react-mapping
 
-This map provides an example of using <a href="https://reactjs.org/" target="_blank">React</a> to create a map that collects entered user data.
+<a href="https://jfobrycki.github.io/react-mapping/" target="_blank">This map</a> provides an example of using <a href="https://reactjs.org/" target="_blank">React</a> to create a map that collects entered user data.
 
 ### General Map Overview
 
-This map allows the user to click the map, add a value for a point, save this point, continue to add points, and then download the data.
+<a href="https://jfobrycki.github.io/react-mapping/" target="_blank">This map</a> allows the user to click the map, add a value for a point, save this point, continue to add points, and then download the data.
 
 ### Uses of React
 
